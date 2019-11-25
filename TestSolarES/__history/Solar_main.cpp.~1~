@@ -1,0 +1,321 @@
+//---------------------------------------------------------------------------
+#include <windows.h>
+#include <iostream>
+#include <math.h>
+#include <complex>
+#include <vcl.h>
+#pragma hdrstop
+#include "Solar_main.h"
+
+ //---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TForm4 *Form4;
+  //---------------------------------------------------------------------------
+__fastcall TForm4::TForm4(TComponent* Owner)
+	: TForm(Owner)
+{
+  hModem = INVALID_HANDLE_VALUE;
+  smsin = smsout = 0;
+  GetSerialPortsList();
+   	for (int t = 0;t< Chart1->SeriesCount();t++)
+										Chart1->Series[t]->Clear();
+	Chart1->Axes->Left->Automatic = false;
+	Chart1->Axes->Left->Maximum = 200;
+	Chart1->Axes->Left->Minimum = 0;
+  }
+
+//---------------------------------------------------------------------------
+void __fastcall TForm4::Button3Click(TObject *Sender)
+{
+  OpenDialog1->DefaultExt = "DataFIle";
+  OpenDialog1->FileName = "*.flx";
+  OpenDialog1->InitialDir=GetCurrentDir();
+
+	if(mFile){
+		delete mFile;
+		mFile = NULL;
+	}
+
+	if (OpenDialog1->Execute())
+	{
+	  mFileName = OpenDialog1->FileName;
+	  Form4->Caption =  mFileName;
+	}
+
+/*
+
+  AnsiString tmpStr ="";
+  int  indx;
+  unsigned long  MaxIndex = 0;
+  int  MaxVal =0;
+  unsigned Time,Val;
+   AnsiString s1,s2;
+   float data[2];
+
+  if(mFile){
+   delete mFile;
+   mFile=NULL;
+  }
+
+  if (OpenDialog1->Execute())
+  {
+
+	 unsigned int num_written;       // number of values written to buffer
+
+	Series1->Clear();
+	Series2->Clear();
+	Series3->Clear();
+	// set paramaters
+	float bt    = StrToFloat(Edit1->Text); //0.1f;     // bandwidth-time product
+	float r=0.104f;     // resampling rate (output/input)
+	float As=40.0f;     // resampling filter stop-band attenuation [dB]
+
+
+	// create objects
+	agc_rrrf q = agc_rrrf_create();
+	agc_rrrf_set_bandwidth(q, bt);
+   //	agc_rrrf_set_gain(q,100.0);     // initial guess at starting signal level
+	// create multi-stage arbitrary resampler object
+	msresamp_rrrf msresamp = msresamp_rrrf_create(r,As);
+	msresamp_rrrf_print(msresamp);
+	int j = 0;
+
+
+	 TStringList *SL_in= new TStringList;
+	 mFileName = OpenDialog1->FileName;
+	 Form4->Caption=  mFileName;
+	 SL_in->LoadFromFile(mFileName); //Файл с именами студентов
+
+	 for (int i=0; i<SL_in->Count; i++){
+		tmpStr = SL_in->Strings[i];
+		indx = tmpStr.Pos("_");  //find
+				tmpStr.Delete(indx,1);  //delete
+
+		indx = tmpStr.Pos(".");  //find
+					tmpStr.Delete(indx,1);  //delete
+					 //	tmpStr.Insert(",",indx); //insert
+
+		indx = tmpStr.Pos(" ");
+		s2  = tmpStr.SubString(indx,100);
+		tmpStr.Delete(indx,100);
+
+		while((indx = s2.Pos(" "))!=0)
+		{
+		 s2.Delete(indx,1);  //delete
+		}
+
+		Val = s2.ToInt();
+		Time=StrToInt(tmpStr);
+		if(Val > MaxVal){
+		   MaxVal = Val;
+		   MaxIndex = i;
+		}
+
+		 float y;  //Empty
+		 float x = Val/(2000 * 25 * 100.0f);
+		  // execute resampler, storing result in output buffer
+			msresamp_rrrf_execute(msresamp, &x, 1, &y, &num_written);
+			if(num_written){
+			  Series3->AddXY(j++,y*5000,"",clTeeColor);
+			}
+
+
+		agc_rrrf_execute(q,x,&y);
+	   //	rssi[i] = agc_rrrf_get_rssi(q);
+		 Series1->AddXY(i,agc_rrrf_get_gain(q),"",clTeeColor);
+		 Series2->AddXY(i,x*5000,"",clTeeColor);
+	   //	Series3->AddXY(i,agc_rrrf_get_rssi(q),"",clTeeColor);
+
+	 }
+	 delete SL_in;
+	 // destroy AGC object
+	agc_rrrf_destroy(q);
+	// clean up allocated objects
+	msresamp_rrrf_destroy(msresamp);
+
+	Series1->Repaint();
+	Series2->Repaint();
+	Series3->Repaint();
+
+ }
+ */
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm4::Edit1KeyPress(TObject *Sender, System::WideChar &Key)
+{
+   //цифра
+   if((Key>='0')&&(Key <= '9')) return;
+   // клавиша <Backspace>
+   if(Key == VK_BACK) return;
+   // клавиша <Enter>
+   if (Key == VK_RETURN) {
+	 Button1->SetFocus();
+			return;
+   }
+
+	/*
+	 if (Key == ','){
+		if ((Edit1->Text).Pos(',') != 0)
+				Key = 0; // разделитель уже введен
+			return;
+	}
+	*/
+ // остальные клавиши запрещены
+	Key = 0;
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm4::Button5Click(TObject *Sender)
+{
+	   if(Button5->Caption == "Open"){
+	   //Get number
+	   int nCom = StrToInt(
+			ComboBox1->Items->Strings[ComboBox1->ItemIndex].Delete(1,3)
+	   );
+	   //пробуем открыть
+	   hModem =  OpenModem(nCom,
+	   			  Handle, //current handle
+				  DEBUG_TRACE //0
+				);
+
+		if(hModem!= INVALID_HANDLE_VALUE){ //Удачно ?
+		  Button5->Caption = "Close";
+		   StatusBar1->Panels->Items[0]->Text=
+		   ComboBox1->Items->Strings[ComboBox1->ItemIndex]
+				  +" Open";
+		  StatusBar1->Panels->Items[1]->Text ="SMS Out:"+UIntToStr(smsout);
+		  StatusBar1->Panels->Items[2]->Text ="SMS In:"+UIntToStr(smsin);
+		  LogMemo->Lines->Clear();
+		}
+		Chart1->BottomAxis->Automatic  =true;
+		Chart1->Repaint();
+	   }
+	   else
+	   {
+		  if(hModem!= INVALID_HANDLE_VALUE)
+		  CloseModem(hModem);
+		  hModem = INVALID_HANDLE_VALUE;
+		  Button5->Caption = "Open";
+		  StatusBar1->Panels->Items[0]->Text="Close COM";
+	   }
+}
+//---------------------------------------------------------------------------
+ void  __fastcall TForm4::GetSerialPortsList()
+{
+	Button5->Enabled=false;
+	AnsiString KeyName = "\\Hardware\\DeviceMap\\SerialComm";
+	TStringList *SerialCommValues = new TStringList();
+	ComboBox1->Items->Clear();
+	TRegistry *Registry = new TRegistry;
+	try
+	{
+		Registry->RootKey = HKEY_LOCAL_MACHINE;
+		Registry->OpenKeyReadOnly( KeyName );
+		Registry->GetValueNames( SerialCommValues );
+		for(int i=0; i<SerialCommValues->Count; i++)
+		{
+			ComboBox1->Items->Add(Registry->ReadString(SerialCommValues->Strings[i]));
+			ComboBox1->ItemIndex=0;
+		   //	Form1->StatusBar1->Panels->Items[0]->Text= Registry->ReadString(SerialCommValues->Strings[i]);
+		}
+	}
+
+	__finally
+	{
+		delete Registry;
+		delete SerialCommValues;
+
+		if (ComboBox1->ItemIndex>=0)
+		{
+			ComboBox1->Enabled=true;
+			Button5->Enabled=true;
+		}
+	}
+}
+//======================================================================
+void __fastcall TForm4::FormClose(TObject *Sender, TCloseAction &Action)
+{
+   if(hModem!= INVALID_HANDLE_VALUE)
+		  CloseModem(hModem);
+}
+//---------------------------------------------------------------------------
+ void __fastcall TForm4::DataAvailable(TMessage& Message)
+ {
+		flx_data inData;
+		Cmd_Data *pCmd;
+//		DWORD elm;
+		UnicodeString S;
+		int8_t text[256];
+		  StatusBar1->Panels->Items[2]->Text ="SMS In:"+UIntToStr(++smsin);
+
+	switch(Message.LParam)
+	{
+		case  ESP_DATA:
+		//	elm = Message.WParam;
+			GetDataModem(hModem,&inData);
+			 sprintf_s(text,sizeof(text),
+			 "[UTC]%02i.%02i.%02i [TR]%5i [MAX]%5i",
+			  inData.timeU/10000000,
+			 (inData.timeU/100000)%100,
+			 (inData.timeU/1000)%100,
+			 inData.treshold,
+			 inData.max_value);
+			LogMemo->Font->Color=clLime;
+			LogMemo->Lines->Add(UnicodeString(text));
+
+		   {
+			for(int i = 0;i<MAX_LEN_DATA*8;i++){
+			Chart1->Series[0]->Add(inData.flx[i]*1000.0,"",clTeeColor);
+			}
+		   }
+				// Scroll the Horizontal Axis
+		 if(Chart1->BottomAxis->Automatic){
+				Chart1->BottomAxis->Automatic  =  false;        // <-- we dont want automatic scaling
+		}
+				Chart1->BottomAxis->Maximum  =  Series1->XValues->Last();
+				Chart1->BottomAxis->Minimum =
+				Chart1->BottomAxis->Maximum - MAX_LEN_DATA*8*3;  // we want to see the last 100 points only
+		break;
+
+		case  RET_STATUS:
+			pCmd =(Cmd_Data *)Message.WParam;
+			 sprintf_s(text,sizeof(text),
+			 "[UTC]%02i.%02i.%02i [TR]%5i [CUR]%5i <<<",
+			  pCmd->Time/10000000,
+			 (pCmd->Time/100000)%100,
+			 (pCmd->Time/1000)%100,
+			 pCmd->Treshold,
+			 pCmd->Curr_Value);
+			 LogMemo->Lines->Add(UnicodeString(text));
+			 Edit1->Text = UIntToStr((unsigned)pCmd->Treshold);
+		break;
+
+	 }
+ }
+void __fastcall TForm4::Button1Click(TObject *Sender)
+{
+	if(hModem!= INVALID_HANDLE_VALUE){
+	int treshold = StrToInt(Edit1->Text);
+	 if(treshold > MAX_ESP) treshold = MAX_ESP;
+	 if(treshold < 50) treshold = 50;
+	 Edit1->Text = IntToStr(treshold);
+	 SetTresHold(hModem, (float)treshold);
+	 StatusBar1->Panels->Items[1]->Text ="SMS Out:"+UIntToStr(++smsout);
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm4::Button2Click(TObject *Sender)
+{
+	if(hModem!= INVALID_HANDLE_VALUE){
+		  GetStatusModem(hModem);
+		  StatusBar1->Panels->Items[1]->Text ="SMS Out:"+UIntToStr(++smsout);
+	}
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm4::LogMemoDblClick(TObject *Sender)
+{
+ LogMemo->Lines->Clear();
+}
+//---------------------------------------------------------------------------
+

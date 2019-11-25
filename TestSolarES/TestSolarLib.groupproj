@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{16EFA17F-D604-4D8E-BA17-1B2F26D3EC3E}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Solar.cbproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Solar">
+        <MSBuild Projects="Solar.cbproj"/>
+    </Target>
+    <Target Name="Solar:Clean">
+        <MSBuild Projects="Solar.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Solar:Make">
+        <MSBuild Projects="Solar.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Solar"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Solar:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Solar:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
