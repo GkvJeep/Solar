@@ -113,6 +113,7 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <ILINK_LibraryPath>liquid;..\ALL_BUILD\bin\Debug</ILINK_LibraryPath>
         <IncludePath>..\SolarLib;$(IncludePath)</IncludePath>
+        <FinalOutputDir>..\ALL_BUILD\bin\Debug\</FinalOutputDir>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <Defines>NDEBUG;$(Defines)</Defines>
