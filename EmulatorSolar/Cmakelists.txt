@@ -1,0 +1,33 @@
+set(TEST_SOURCES
+	 emulator.cpp
+ )
+
+ set(TEST_INCLUDES
+  ${PROJECT_SOURCE_DIR}/External/msvc/
+  ${PROJECT_SOURCE_DIR}/emulator/
+  ${PROJECT_SOURCE_DIR}/SolarLib/
+ )
+ 
+ SET (test_headers
+	${PROJECT_SOURCE_DIR}/SolarLib/Serial.h
+	${PROJECT_SOURCE_DIR}/SolarLib/DataSolar.h
+	${PROJECT_SOURCE_DIR}/SolarLib/SolarLib.h
+	${PROJECT_SOURCE_DIR}/SolarLib/debug.h
+	
+)
+
+set(BINARY_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin")
+set (PROJECT_LINK_LIBS SolarLib)
+
+add_executable(Emulator ${TEST_SOURCES} ${test_headers})
+target_link_libraries (Emulator ${PROJECT_LINK_LIBS} )
+target_include_directories(Emulator PUBLIC ${TEST_INCLUDES} )  
+
+
+set_target_properties(Emulator PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+ if (MSVC)
+        set_property(TARGET Emulator APPEND PROPERTY LINK_FLAGS  /SUBSYSTEM:CONSOLE )
+ endif(MSVC)
+
+install(TARGETS Emulator DESTINATION bin)

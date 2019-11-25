@@ -1,0 +1,27 @@
+set(SOLARLIB_SOURCES
+	SolarLib.cpp
+	Serial.cpp
+)
+
+SET (solarlib_headers
+	SolarLib.h
+	Serial.h
+	DataSolar.h
+	debug.h
+	)
+
+
+ set(SOLARLIB_INCLUDES
+ ${PROJECT_SOURCE_DIR}/External/msvc/
+ )
+
+set(BINARY_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin")
+add_library(SolarLib SHARED  ${SOLARLIB_SOURCES} ${solarlib_headers})
+#add_library(LibSolar STATIC  ${SOLARLIB_SOURCES} ${solarlib_headers})
+target_include_directories(SolarLib PUBLIC ${SOLARLIB_INCLUDES}) 
+#target_include_directories(LibSolar PUBLIC ${SOLARLIB_INCLUDES})   
+
+target_link_libraries(SolarLib  ${LIQUID_LIBRARIES}  )
+set_target_properties(SolarLib PROPERTIES DEFINE_SYMBOL "_DLL_EXPORTS"
+		 RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIR})
+		 
