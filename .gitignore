@@ -2,3 +2,4 @@ __history/
 __recovery/
 win32/
 ALL_BUILD/
+*.~*

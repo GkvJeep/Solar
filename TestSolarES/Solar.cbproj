@@ -64,7 +64,6 @@
         <Icon_MainIcon>$(BDS)\bin\cbuilder_PROJECTICON.ico</Icon_MainIcon>
         <UWP_CppLogo44>$(BDS)\bin\Artwork\Windows\UWP\cppreg_UwpDefault_44.png</UWP_CppLogo44>
         <UWP_CppLogo150>$(BDS)\bin\Artwork\Windows\UWP\cppreg_UwpDefault_150.png</UWP_CppLogo150>
-        <IncludePath>..\SolarDLL;..\DatatSolar;$(IncludePath)</IncludePath>
         <SanitizedProjectName>Solar</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
@@ -76,7 +75,7 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-        <ILINK_LibraryPath>D:\Solar\WinAppl\ALL_BUILD\bin\Debug\;D:\Solar\WinAppl\TestSolarES\liquid\;$(BDSLIB)\$(PLATFORM)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_LibraryPath>$(BDSLIB)\$(PLATFORM)\debug;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <FinalOutputDir>D:\Solar\WinAppl\ALL_BUILD\bin\Debug\</FinalOutputDir>
         <BCC_IncludePath>..\SolarLib;$(BCC_IncludePath)</BCC_IncludePath>
     </PropertyGroup>
@@ -112,7 +111,7 @@
         <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <ILINK_LibraryPath>D:\Solar\WinAppl\TestSolarES\liquid;D:\Solar\WinAppl\ALL_BUILD\bin\Debug</ILINK_LibraryPath>
+        <ILINK_LibraryPath>liquid;..\ALL_BUILD\bin\Debug</ILINK_LibraryPath>
         <IncludePath>..\SolarLib;$(IncludePath)</IncludePath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">

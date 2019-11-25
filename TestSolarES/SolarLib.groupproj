@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{16EFA17F-D604-4D8E-BA17-1B2F26D3EC3E}</ProjectGuid>
+        <ProjectGuid>{AE0269FB-CCD7-4F52-8673-A989F731B40D}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
         <Projects Include="Solar.cbproj">
