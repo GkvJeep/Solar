@@ -189,9 +189,8 @@ DWORD threadProc(LPVOID lParam)
 	Input_Data inRx;
 	uint16_t pParser = 0;
 	uint8_t  *pinRx = (uint8_t *)&inRx;
-	Cmd_Data *pCMD  = (Cmd_Data *)&inRx;
-	Cmd_Data txCmd;
 	DWORD dwWritten;
+	size_t get_status = 0;
 
 	//Debug
 	size_t msg_cnt = 0;
@@ -250,6 +249,7 @@ DWORD threadProc(LPVOID lParam)
 													FLX_data.timeU = inRx.Time;
 													FLX_data.treshold = inRx.Treshold;
 													FLX_data.max_value = inRx.MaxValue;
+													//FLX_data.cnt_sms   = pCMD->outsms;
 
 													//decode
 													rxCVSD.set_ref(inRx.Ref_CVSD);
@@ -284,38 +284,33 @@ DWORD threadProc(LPVOID lParam)
 											break;
 
 											case SET_PARAM:
-												pTask->treshold = pCMD->Treshold;
-												DEBUG(TRACE, "RX SET_PARAM  %i:%i\r\n", pCMD->Treshold, pCMD->Time);
+												pTask->treshold = inRx.Treshold;
+												DEBUG(TRACE, "RX SET_PARAM  %i:%i\r\n", inRx.Treshold, inRx.Time);
 											//break;
 
 											case GET_STATUS:
-												txCmd.Start_byte = 1;
-												txCmd.Name[0] = 'R';
-												txCmd.Name[1] = 'K';
-												txCmd.Mode = RET_STATUS;
-												txCmd.Time = GetTime();
-												txCmd.Len_Data = 64-20;
-												txCmd.Treshold = (uint16_t)pTask->treshold;
-												txCmd.Curr_Value = (uint16_t)pTask->current_esp_lev;
-												txCmd.Max_Value = (uint16_t)MAX_ESP;
-												txCmd.Max_Len = MAX_LEN_DATA;
-												txCmd.Flags = STOP_TASK;
-												pTask->outsms++;
-												txCmd.outsms = pTask->outsms;
-												EnterCriticalSection(&pTask->CrSec);
-												pTask->pSerialCell->WriteData((uint8_t *)&txCmd, sizeof(Cmd_Data), &dwWritten);
-												LeaveCriticalSection(&pTask->CrSec);
-												DEBUG(TRACE, "TX RET_STATUS  %i:%i\r\n",txCmd.Curr_Value,txCmd.Time);
+												get_status++;
 											break;
 
 											case RET_STATUS:
-												memcpy((uint8_t *)&txCmd, (uint8_t *)&inRx, sizeof(Cmd_Data));
+												float *pData = FLX_data.flx;
+												//Время
+												FLX_data.timeU = inRx.Time;
+												FLX_data.treshold = inRx.Treshold;
+												FLX_data.max_value = inRx.MaxValue;
+												//decode
+												rxCVSD.set_ref(inRx.Ref_CVSD);
+												rxCVSD.set_bitref(inRx.bitref_CVSD);
+												for (int i = 0; i < inRx.Len_Data; i++) {
+													rxCVSD.cvsd_decode8(inRx.bData[i], pData);
+													pData += 8;
+												}
 												if (pTask->hwnd)
 													PostMessage((HWND__*)pTask->hwnd, ESP_EVENT,
-														WPARAM(&txCmd),
+														WPARAM(&FLX_data),
 														LPARAM(RET_STATUS));
 
-												DEBUG(TRACE, "RX RET_STATUS  %i:%i\r\n", txCmd.Curr_Value, txCmd.Time);
+												DEBUG(TRACE, "RX RET_STATUS  %i:%i\r\n", inRx.MaxValue, inRx.Time);
 											break;
 
 										}
@@ -337,7 +332,9 @@ DWORD threadProc(LPVOID lParam)
 					Tx_Data[nData].Start_byte = 1;
 					Tx_Data[nData].Name[0] = 'R';
 					Tx_Data[nData].Name[1] = 'K';
+					
 					Tx_Data[nData].Mode = ESP_DATA;
+
 					Tx_Data[nData].Time = msg.wParam;
 					Tx_Data[nData].MaxValue = 0;
 					Tx_Data[nData].Treshold = (uint16_t)pTask->treshold;
@@ -356,7 +353,6 @@ DWORD threadProc(LPVOID lParam)
 					Tx_Data[nData].Len_Data = in_pnt;
 
 					if (Tx_Data[nData].MaxValue >= pTask->treshold) {
-						 msg_cnt++;
 						if (pTask->pSerialCell) {
 							EnterCriticalSection(&pTask->CrSec);
 							pTask->pSerialCell->WriteData((BYTE*)&Tx_Data[nData], in_pnt + 20, &dwWritten);
@@ -364,8 +360,21 @@ DWORD threadProc(LPVOID lParam)
 							LeaveCriticalSection(&pTask->CrSec);
 							DEBUG(TRACE, "TX ESP_DATA %i\r\n", GetTime());
 						}
-							
+					}else 
+					if(get_status){
+						get_status = 0;
+						Tx_Data[nData].Mode = RET_STATUS;
+						Tx_Data[nData].Len_Data = in_pnt;
+
+						if (pTask->pSerialCell) {
+							EnterCriticalSection(&pTask->CrSec);
+							pTask->pSerialCell->WriteData((BYTE*)&Tx_Data[nData], in_pnt + 20, &dwWritten);
+							pTask->outsms++;
+							LeaveCriticalSection(&pTask->CrSec);
+							DEBUG(TRACE, "TX RET_STATUS  %i:%i\r\n", Tx_Data[nData].MaxValue, Tx_Data[nData].Time);
+						}
 					}
+
 					in_pnt = 0;
 					//Change bufferS  
 					nData = (nData + 1) & 1;
@@ -410,20 +419,20 @@ DWORD threadProc(LPVOID lParam)
 /////////////////////////////////////////////////////////////////////////
 BOOL	 VCPP_API   GetStatusModem(HANDLE handle) {
 
-	Cmd_Data mCmd;
+	Input_Data mCmd;
 	if (handle == INVALID_HANDLE_VALUE)
 		return FALSE;
 	Task *pTask = (Task*)handle;
-	memset((void *)&mCmd, 0, sizeof(Cmd_Data));
+	memset((void *)&mCmd, 0, sizeof(Input_Data));
 	mCmd.Start_byte = 1;
 	mCmd.Name[0] = 'R';
 	mCmd.Name[1] = 'K';
 	mCmd.Mode = GET_STATUS;
-	mCmd.Len_Data = 64-20;
+	mCmd.Len_Data = MAX_LEN_DATA;
 	if (pTask->pSerialCell) {
 		EnterCriticalSection(&pTask->CrSec);
 		DWORD dwWritten;
-		pTask->pSerialCell->WriteData((uint8_t *)&mCmd, sizeof(Cmd_Data), &dwWritten);
+		pTask->pSerialCell->WriteData((uint8_t *)&mCmd, sizeof(Input_Data), &dwWritten);
 		pTask->outsms++;
 		LeaveCriticalSection(&pTask->CrSec);
 		DEBUG(TRACE, "CMD GetStatusModem :%ui\r\n", GetTime());
@@ -438,21 +447,21 @@ BOOL	 VCPP_API   SetTresHold(HANDLE handle, float treshold)
  if (handle == INVALID_HANDLE_VALUE)
 		    return FALSE;
 
-	Cmd_Data mCmd;
+    Input_Data mCmd;
 	Task *pTask = (Task*)handle;
-	memset((void *)&mCmd, 0, sizeof(Cmd_Data));
+	memset((void *)&mCmd, 0, sizeof(Input_Data));
 	mCmd.Start_byte = 1;
 	mCmd.Name[0] = 'R';
 	mCmd.Name[1] = 'K';
 	mCmd.Mode = SET_PARAM;
 	mCmd.Time = GetTime();
 	mCmd.Treshold = (uint16_t)treshold;
-	mCmd.Len_Data =64-20;
+	mCmd.Len_Data = MAX_LEN_DATA;
 
 	if (pTask->pSerialCell) {
 		EnterCriticalSection(&pTask->CrSec);
 		DWORD dwWritten;
-		pTask->pSerialCell->WriteData((uint8_t *)&mCmd, sizeof(Cmd_Data), &dwWritten);
+		pTask->pSerialCell->WriteData((uint8_t *)&mCmd, sizeof(Input_Data), &dwWritten);
 		pTask->outsms++;
 		LeaveCriticalSection(&pTask->CrSec);
 		DEBUG(TRACE, "TX SET_PARAM  %i:%i\r\n", mCmd.Treshold, mCmd.Time);

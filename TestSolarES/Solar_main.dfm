@@ -151,7 +151,6 @@ object FormIpg: TFormIpg
     Align = alClient
     Color = clBlack
     TabOrder = 3
-    ExplicitLeft = -6
     DefaultCanvas = 'TGDIPlusCanvas'
     PrintMargins = (
       15

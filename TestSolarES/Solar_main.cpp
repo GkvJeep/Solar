@@ -126,7 +126,7 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
  void __fastcall TFormIpg::DataAvailable(TMessage& Message)
  {
 		flx_data inData;
-		Cmd_Data *pCmd;
+		flx_data  *pCmd;
 //		DWORD elm;
 		UnicodeString S;
 		int8_t text[256];
@@ -162,16 +162,16 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
 		break;
 
 		case  RET_STATUS:
-			pCmd =(Cmd_Data *)Message.WParam;
+			pCmd =(flx_data *)Message.WParam;
 			 sprintf_s(text,sizeof(text),
 			 "[UTC]%02i.%02i.%02i [TR]%5i [CUR]%5i <<<",
-			  pCmd->Time/10000000,
-			 (pCmd->Time/100000)%100,
-			 (pCmd->Time/1000)%100,
-			 pCmd->Treshold,
-			 pCmd->Curr_Value);
+			  pCmd->timeU/10000000,
+			 (pCmd->timeU/100000)%100,
+			 (pCmd->timeU/1000)%100,
+			 pCmd->treshold,
+			 pCmd->max_value);
 			 LogMemo->Lines->Add(UnicodeString(text));
-			 Edit1->Text = UIntToStr((unsigned)pCmd->Treshold);
+			 Edit1->Text = UIntToStr((unsigned)pCmd->treshold);
 		break;
 
 	 }
