@@ -56,26 +56,7 @@ typedef unsigned char  CVSD_t;    // 8  bits
 
  }Input_Data,*pInput_Data;
 
- /*
-  Структура для служебных комманд
- */
-/*
- typedef struct {
-	 //Index
-	 uint8_t Start_byte;      //[0]  всегда 0x01 (по ASCII код символа SOH )
-	 uint8_t  Name[2];        //[1,2] ( 'R','K' )
-	 uint8_t  Mode;           //[3]  CMD_HOST,STATUS,FLM .....
-	 uint32_t Time;           //[4,5,6,7] (Время по UTC для события)
-	 uint16_t Len_Data;       //[8,9] (количество байт в обьединение (uData )
-	 uint16_t Curr_Value;	  //[10,11]  Текущее значение
-	 uint16_t Treshold;		  //[12,13]  Порог срабатывания
-	 float    Ref_CVSD;       //[14,15,16,17] Текущее значение 
-	 uint8_t  bitref_CVSD;    //[18]
-	 uint8_t  CS;             //[19] (Контрольная сумма по модулю 256)
-
-	 CVSD_t  bData[MAX_LEN_DATA];   // данные в кодировке  CVSD (смотри ниже класс CVSD )
- }Cmd_Data, *pCmd_Data;
- */
+ 
 
  typedef struct {
 	 DWORD timeU;                   //4
@@ -83,7 +64,6 @@ typedef unsigned char  CVSD_t;    // 8  bits
 	 uint16_t max_value;            //2 
 	 float flx[MAX_LEN_DATA * 8];   //4 * 960
 	 uint16_t cnt_sms;
-
  }flx_data, *pflx_data;
 #pragma pack(pop)
 

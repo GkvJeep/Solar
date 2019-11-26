@@ -134,12 +134,12 @@ public:
                
 					WriteInteger("Setting", "Treshold", treshold);
 					WriteInteger("Setting", "OutSMS", outsms);
-					WriteFloat("Setting", "CurValue", current_esp_lev);
+					WriteInteger("Setting", "CurValue", (int)current_esp_lev);
 					::CloseHandle(hIni);
 			}
 			treshold = ReadInteger("Setting", "Treshold", treshold);
 			outsms = ReadInteger("Setting", "OutSMS", outsms);
-			current_esp_lev = ReadFloat("Setting", "CurValue", current_esp_lev);
+			current_esp_lev = ReadInteger("Setting", "CurValue", (int)current_esp_lev);
 			
 	    }
 
@@ -148,7 +148,7 @@ public:
 			if (error != ERROR_ALREADY_EXISTS) {
 				WriteInteger("Setting", "Treshold", treshold);
 				WriteInteger("Setting", "OutSMS", outsms);
-				WriteFloat("Setting", "CurValue", current_esp_lev);
+				WriteInteger("Setting", "CurValue", (int)current_esp_lev);
 			}
 			CloseHandle(hMutex);
 			DEBUG(TRACE, "Treshold:%5i CurValue:%5i OutSMS:%5i\r\n", treshold, (int)current_esp_lev,outsms);
@@ -193,7 +193,6 @@ DWORD threadProc(LPVOID lParam)
 	size_t get_status = 0;
 
 	//Debug
-	size_t msg_cnt = 0;
 	DEBUG(TRACE, "Create main Thread Com %i  \r\n", pTask->ComPort);
 	//Синхронизация потоков
 	while (pTask->m_hThread == INVALID_HANDLE_VALUE)
@@ -301,10 +300,14 @@ DWORD threadProc(LPVOID lParam)
 												//decode
 												rxCVSD.set_ref(inRx.Ref_CVSD);
 												rxCVSD.set_bitref(inRx.bitref_CVSD);
-												for (int i = 0; i < inRx.Len_Data; i++) {
+
+												// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+												for (int i = 0; i < inRx.Len_Data-2; i++) {
 													rxCVSD.cvsd_decode8(inRx.bData[i], pData);
 													pData += 8;
 												}
+												FLX_data.cnt_sms = inRx.bData[118] + inRx.bData[119] * 256;
+
 												if (pTask->hwnd)
 													PostMessage((HWND__*)pTask->hwnd, ESP_EVENT,
 														WPARAM(&FLX_data),
@@ -370,6 +373,9 @@ DWORD threadProc(LPVOID lParam)
 							EnterCriticalSection(&pTask->CrSec);
 							pTask->pSerialCell->WriteData((BYTE*)&Tx_Data[nData], in_pnt + 20, &dwWritten);
 							pTask->outsms++;
+							Tx_Data[nData].bData[118] = pTask->outsms;
+							Tx_Data[nData].bData[119] = pTask->outsms>>8;
+
 							LeaveCriticalSection(&pTask->CrSec);
 							DEBUG(TRACE, "TX RET_STATUS  %i:%i\r\n", Tx_Data[nData].MaxValue, Tx_Data[nData].Time);
 						}
