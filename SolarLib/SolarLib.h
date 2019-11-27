@@ -2,8 +2,13 @@
 #define __SOLARLIBH__
 #include <windows.h>
 #include <stdio.h>
-#include <stdint.h> 
 #define MAX_MODEM 1
+
+typedef unsigned int uint32_t;
+typedef unsigned short uint16_t;
+typedef unsigned char uint8_t;
+
+
 
 #ifdef _DLL_EXPORTS
 #define VCPP_API __declspec(dllexport)
@@ -39,11 +44,11 @@ extern "C" HANDLE VCPP_API   OpenModem(int com_port,HANDLE hwnd, uint32_t debug_
 */
 extern "C" void VCPP_API    SetDataModem(HANDLE handle,DWORD Time_UTC,float flx);
 
+////////////////////////////////////////////////////////////////////////
 /*
 * Функции на приемной стороне
 *
 */
-
 /*///////////////////////////////////////////////////////
 Получить данные
 * (1)Хендл модема полученный через функцию  OpenModem

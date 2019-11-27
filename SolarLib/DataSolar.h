@@ -3,7 +3,7 @@
 #ifndef DataSolarH
 #define DataSolarH
 #include <time.h>
-#include <stdint.h>
+#include "SolarLib.h"
 
 #define MAX_ESP 10000.f      //Константа нормирования к диапазону 0.0 ... 1.0
 #define MAX_LEN_DATA 120     //Максимальная длина буфера для данных

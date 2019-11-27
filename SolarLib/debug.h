@@ -10,7 +10,7 @@
 #ifndef __DEBUGH__
 #define __DEBUGH__
 #include <stdio.h>
-#include <stdint.h>
+#include "SolarLib.h"
 #ifdef DIST_WINDOWS
 
 #ifdef ERROR
