@@ -301,11 +301,12 @@ DWORD threadProc(LPVOID lParam)
 												rxCVSD.set_ref(inRx.Ref_CVSD);
 												rxCVSD.set_bitref(inRx.bitref_CVSD);
 
-												// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+												// >>>>>> Oly 118 byte <<<<<<<   
 												for (int i = 0; i < inRx.Len_Data-2; i++) {
 													rxCVSD.cvsd_decode8(inRx.bData[i], pData);
 													pData += 8;
 												}
+												//+ 2 byte  counter SMS
 												FLX_data.cnt_sms = inRx.bData[118] + inRx.bData[119] * 256;
 
 												if (pTask->hwnd)
