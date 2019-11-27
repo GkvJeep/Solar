@@ -64,7 +64,7 @@ public:
 	DWORD      ComPort;
 	SerialCell *pSerialCell;
 	espfifo*   pEspFifo; 
-	CRITICAL_SECTION CrSec = {0};
+	CRITICAL_SECTION CrSec;
 	float current_esp_lev;
 	uint32_t  outsms;
 	uint16_t treshold;
@@ -109,6 +109,9 @@ public:
 		pSerialCell(NULL)
 		//----------------------------------------------
 		{
+		
+		memset(&CrSec, 0, sizeof(CRITICAL_SECTION));
+
 		::InitializeCriticalSection(&CrSec);
 
 		hMutex = CreateMutex(
