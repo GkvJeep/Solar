@@ -152,8 +152,8 @@ public:
 				WriteInteger("Setting", "Treshold", treshold);
 				WriteInteger("Setting", "OutSMS", outsms);
 				WriteInteger("Setting", "CurValue", (int)current_esp_lev);
+				CloseHandle(hMutex);
 			}
-			CloseHandle(hMutex);
 			DEBUG(TRACE, "Treshold:%5i CurValue:%5i OutSMS:%5i\r\n", treshold, (int)current_esp_lev,outsms);
 	}
 };
