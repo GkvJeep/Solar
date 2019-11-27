@@ -2,8 +2,7 @@
 #define __SOLARLIBH__
 #include <windows.h>
 #include <stdio.h>
-#include "DataSolar.h"
-#include "debug.h"
+#include <stdint.h> 
 #define MAX_MODEM 1
 
 #ifdef _DLL_EXPORTS
@@ -50,7 +49,7 @@ extern "C" void VCPP_API    SetDataModem(HANDLE handle,DWORD Time_UTC,float flx)
 * (1)Хендл модема полученный через функцию  OpenModem
 *  Примечание вызов по событию
 */
-extern "C" DWORD VCPP_API   GetDataModem(HANDLE handle, flx_data *pData);
+extern "C" DWORD VCPP_API   GetDataModem(HANDLE handle, void *pData);
 
 /*//////////////////////////////////////////////////////
 * Запрос текушего статуса
@@ -70,7 +69,7 @@ extern "C" BOOL	 VCPP_API   SetTresHold(HANDLE handle, float treshold);
 /*//////////////////////////////////////////////////
 Только для отладки
 */
-extern "C" BOOL	  VCPP_API   TestSMS(HANDLE handle,uint8_t *data,size_t size);
+extern "C" BOOL	  VCPP_API   TestSMS(HANDLE handle, void *data,size_t size);
 
 /*///////////////////////////////////////////////////////////////////////
 Закрытие сесии

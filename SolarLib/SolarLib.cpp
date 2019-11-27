@@ -477,7 +477,7 @@ BOOL	 VCPP_API   SetTresHold(HANDLE handle, float treshold)
 
 }
 /////////////////////////////////////////////////////////////////////////
-BOOL	  VCPP_API   TestSMS(HANDLE handle, uint8_t *data, size_t size) {
+BOOL	  VCPP_API   TestSMS(HANDLE handle, void *data, size_t size) {
 	if (handle == INVALID_HANDLE_VALUE)
 		return FALSE;
 
@@ -485,7 +485,7 @@ BOOL	  VCPP_API   TestSMS(HANDLE handle, uint8_t *data, size_t size) {
 	if (pTask->pSerialCell) {
 		EnterCriticalSection(&pTask->CrSec);
 		DWORD dwWritten;
-		pTask->pSerialCell->WriteData(data, size, &dwWritten);
+		pTask->pSerialCell->WriteData((BYTE *)data, size, &dwWritten);
 		pTask->outsms++;
 		LeaveCriticalSection(&pTask->CrSec);
 		DEBUG(TRACE, "TestSMS:%i\r\n", GetTime());
@@ -601,7 +601,7 @@ void VCPP_API SetDataModem(HANDLE handle,DWORD TimeU, float ESP)
 	);
 }
 ///////////////////////////////////////////////////////////////
-DWORD VCPP_API GetDataModem(HANDLE handle, flx_data *pData) {
+DWORD VCPP_API GetDataModem(HANDLE handle, void * pData) {
 	if (handle == INVALID_HANDLE_VALUE)
 		return 0;
 
@@ -610,7 +610,7 @@ DWORD VCPP_API GetDataModem(HANDLE handle, flx_data *pData) {
 	if (num) {
 		void * el;
 		pTask->pEspFifo->getp(el);
-		memcpy(pData, el, sizeof(flx_data));
+		memcpy((flx_data *)pData, el, sizeof(flx_data));
 	}
 	return num;
     

@@ -3,3 +3,4 @@ __recovery/
 win32/
 ALL_BUILD/
 *.~*
+*.dsk
