@@ -9,7 +9,6 @@ typedef unsigned short uint16_t;
 typedef unsigned char uint8_t;
 
 
-
 #ifdef _DLL_EXPORTS
 #define VCPP_API __declspec(dllexport)
 #else
