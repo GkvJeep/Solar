@@ -101,7 +101,7 @@ SerialCell::~SerialCell(void)
 		CloseHandle(hPortHandle);
 		hPortHandle = INVALID_HANDLE_VALUE;
 	}
-	DEBUG(TRACE, "Destroyed SerialCell\r\n");
+	DEBUG(TRACE, "Destroyed Serial Class\r\n");
 }
 //---------------------------------------------------------------------------
 DWORD SerialCell::ReadData(PUCHAR Data, DWORD Len)
