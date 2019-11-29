@@ -69,5 +69,5 @@ extern FILE *win_stderr;
 #endif
 #endif
 
-extern uint32_t debug_level;
+extern unsigned int  debug_level;
 #endif

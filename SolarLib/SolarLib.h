@@ -2,6 +2,7 @@
 #define __SOLARLIBH__
 #include <windows.h>
 #include <stdio.h>
+#include "debug.h"
 #define MAX_MODEM 1
 
 typedef unsigned int uint32_t;
