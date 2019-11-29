@@ -3,3 +3,8 @@ __recovery/
 win32/
 *.~*
 *.dsk
+*.vcxproj
+*.filters
+*.user
+*.cmake
+*.sln
