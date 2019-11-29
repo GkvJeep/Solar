@@ -1,6 +1,6 @@
-/.vs/
-/bin/
-/CMakeFiles/
-/Debug/
-/EmulatorSolar/
-/SolarLib
+.vs/
+bin/
+CMakeFiles/
+Debug/
+EmulatorSolar/
+SolarLib

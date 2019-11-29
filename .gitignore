@@ -8,3 +8,5 @@ win32/
 *.user
 *.cmake
 *.sln
+/.vs
+/ALL_BUILD/CMakeCache.txt

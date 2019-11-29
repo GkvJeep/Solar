@@ -12,7 +12,6 @@ class espfifo
 private:
 	char  *fifo, *Top, *Que;
 	int   numel, len;
-
 public:
 	espfifo(int num) {
 		numel = num;
@@ -23,12 +22,10 @@ public:
 		VirtualLock(fifo, numel * len);
 		Top = Que = fifo;
 	}
-
 	~espfifo(void) {
 		VirtualUnlock(fifo, numel * len);   //  * sizeof(byte) omitted...
 		VirtualFree(fifo, 0, MEM_RELEASE);
 	}
-
 	bool getp(void* &el) {
 		el = Que;
 		Que += len;
