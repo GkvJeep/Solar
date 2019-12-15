@@ -20,7 +20,7 @@
 #include <Vcl.Menus.hpp>
 #include <complex>
 #include "liquid/liquid.h"
-#include "SolarLib.h"
+#include "DataSolar.h"
 #include <Registry.hpp>
 
 

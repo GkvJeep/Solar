@@ -59,7 +59,7 @@ void __fastcall TFormIpg::Button5Click(TObject *Sender)
 	   //пробуем открыть
 	   hModem =  OpenModem(nCom,
 	   			  Handle, //current handle
-				  DEBUG_TRACE //0
+				  -1 //DEBUG_TRACE //0
 				);
 
 		if(hModem!= INVALID_HANDLE_VALUE){ //Удачно ?

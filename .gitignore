@@ -9,4 +9,4 @@ win32/
 *.cmake
 *.sln
 /.vs
-/ALL_BUILD/CMakeCache.txt
+/ALL_BUILD/
