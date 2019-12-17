@@ -237,11 +237,11 @@ DWORD threadProc(LPVOID lParam)
 									if (pParser >= inRx.Len_Data + 20)
 									{
 										pParser = 0;   //Stop,Wait Next
-
+										//Обработка комманд по приёму
 										switch (inRx.Mode)
 										{
-											case ESP_DATA:
-												DEBUG(TRACE, "RX ESP_DATA %i\r\n",GetTime());
+											case FLX_DATA: //Данные от телескопа 
+												DEBUG(TRACE, "RX FLX_DATA [T]%i\r\n",GetTime()/1000);
 												{
 													float *pData = FLX_data.flx;
 													//Время
@@ -257,7 +257,7 @@ DWORD threadProc(LPVOID lParam)
 														rxCVSD.cvsd_decode8(inRx.bData[i], pData);
 														pData += 8;
 													}
-
+													//Сообщить окну или записать в файл
 													if (pTask->hwnd) {
 														pTask->pEspFifo->put((void *)&FLX_data);
 														PostMessage((HWND__*)pTask->hwnd, ESP_EVENT,
@@ -268,7 +268,7 @@ DWORD threadProc(LPVOID lParam)
 														FILE *stream;
 														
 														char name[256];
-														sprintf(name, "%i.esp", GetTime());
+														sprintf(name, "%i.flx", GetTime()/1000);
 														if (!fopen_s(&stream, name, "w")) {
 															fwrite(
 																&FLX_data,
@@ -282,9 +282,9 @@ DWORD threadProc(LPVOID lParam)
 												}
 											break;
 
-											case SET_PARAM:
+											case SET_PARAM: //Установить Порог
 												pTask->treshold = inRx.Treshold;
-												DEBUG(TRACE, "RX SET_PARAM  %i:%i\r\n", inRx.Treshold, inRx.Time);
+												DEBUG(TRACE, "RX SET_PARAM [T] %i:[TRESHOLD]%i\r\n", GetTime()/1000, inRx.Treshold);
 											//break;
 
 											case GET_STATUS:
@@ -301,7 +301,7 @@ DWORD threadProc(LPVOID lParam)
 												rxCVSD.set_ref(inRx.Ref_CVSD);
 												rxCVSD.set_bitref(inRx.bitref_CVSD);
 
-												// >>>>>> Oly 118 byte <<<<<<<   
+												// >>>>>> Only 118 byte <<<<<<<   
 												for (int i = 0; i < inRx.Len_Data-2; i++) {
 													rxCVSD.cvsd_decode8(inRx.bData[i], pData);
 													pData += 8;
@@ -314,7 +314,7 @@ DWORD threadProc(LPVOID lParam)
 														WPARAM(&FLX_data),
 														LPARAM(RET_STATUS));
 
-												DEBUG(TRACE, "RX RET_STATUS  %i:%i\r\n", inRx.MaxValue, inRx.Time);
+												DEBUG(TRACE, "RX RET_STATUS [T]:%i MaxFLX:%ir\n", inRx.Time,inRx.MaxValue);
 											break;
 
 										}
@@ -335,9 +335,9 @@ DWORD threadProc(LPVOID lParam)
 				if (!in_pnt) {
 					Tx_Data[nData].Start_byte = 1;
 					Tx_Data[nData].Name[0] = 'R';
-					Tx_Data[nData].Name[1] = 'K';
+					Tx_Data[nData].Name[1] = 'K'; 
 					
-					Tx_Data[nData].Mode = ESP_DATA;
+					Tx_Data[nData].Mode = FLX_DATA;
 
 					Tx_Data[nData].Time = msg.wParam;
 					Tx_Data[nData].MaxValue = 0;
@@ -362,10 +362,11 @@ DWORD threadProc(LPVOID lParam)
 							pTask->pSerialCell->WriteData((BYTE*)&Tx_Data[nData], in_pnt + 20, &dwWritten);
 							pTask->outsms++;
 							LeaveCriticalSection(&pTask->CrSec);
-							DEBUG(TRACE, "TX ESP_DATA %i\r\n", GetTime());
+							DEBUG(TRACE, "TX FLX_DATA [T]:%i MaxFLX:%i\r\n", Tx_Data[nData].Time, Tx_Data[nData].MaxValue);
 						}
 					}else 
-					if(get_status){
+					if(get_status){ 
+						//По запросу статуса вернем ВСЕ текущие данные (чтобы не пропадалала SMS)
 						get_status = 0;
 						Tx_Data[nData].Mode = RET_STATUS;
 						Tx_Data[nData].Len_Data = in_pnt;
@@ -376,9 +377,8 @@ DWORD threadProc(LPVOID lParam)
 							pTask->outsms++;
 							Tx_Data[nData].bData[118] = pTask->outsms;
 							Tx_Data[nData].bData[119] = pTask->outsms>>8;
-
 							LeaveCriticalSection(&pTask->CrSec);
-							DEBUG(TRACE, "TX RET_STATUS  %i:%i\r\n", Tx_Data[nData].MaxValue, Tx_Data[nData].Time);
+							DEBUG(TRACE, "TX RET_STATUS [T]:%i MaxFLX:%i\r\n", Tx_Data[nData].Time,Tx_Data[nData].MaxValue);
 						}
 					}
 
@@ -442,7 +442,7 @@ BOOL	 VCPP_API   GetStatusModem(HANDLE handle) {
 		pTask->pSerialCell->WriteData((uint8_t *)&mCmd, sizeof(Input_Data), &dwWritten);
 		pTask->outsms++;
 		LeaveCriticalSection(&pTask->CrSec);
-		DEBUG(TRACE, "CMD GetStatusModem :%ui\r\n", GetTime());
+		DEBUG(TRACE, "CMD GetStatusModem :%ui\r\n", GetTime()/1000);
 		return TRUE;
 	}
 	return FALSE;
@@ -489,7 +489,7 @@ BOOL	  VCPP_API   TestSMS(HANDLE handle, void *data, size_t size) {
 		pTask->pSerialCell->WriteData((BYTE *)data, size, &dwWritten);
 		pTask->outsms++;
 		LeaveCriticalSection(&pTask->CrSec);
-		DEBUG(TRACE, "TestSMS:%i\r\n", GetTime());
+		DEBUG(TRACE, "TestSMS:%i\r\n", GetTime()/1000);
 		return TRUE;
 	}
 	return FALSE;
