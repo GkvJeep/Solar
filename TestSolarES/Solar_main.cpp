@@ -134,7 +134,7 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
 
 	switch(Message.LParam)
 	{
-		case  ESP_DATA:
+		case  FLX_DATA:
 		//	elm = Message.WParam;
 			GetDataModem(hModem,&inData);
 			 sprintf_s(text,sizeof(text),
