@@ -241,14 +241,17 @@ DWORD threadProc(LPVOID lParam)
 										switch (inRx.Mode)
 										{
 											case FLX_DATA: //Данные от телескопа 
-												DEBUG(TRACE, "RX FLX_DATA [T]%i\r\n",GetTime()/1000);
+											case RET_STATUS:
+												if(inRx.Mode == FLX_DATA)
+												DEBUG(TRACE, "[R]DATA [T]:%6i FLX:%i\r\n", inRx.Time/1000, inRx.MaxValue);
+												else
+												DEBUG(TRACE, "[R]STATUS [T]:%6i FLX:%i\r\n", inRx.Time/1000, inRx.MaxValue);
 												{
 													float *pData = FLX_data.flx;
 													//Время
 													FLX_data.timeU = inRx.Time;
 													FLX_data.treshold = inRx.Treshold;
 													FLX_data.max_value = inRx.MaxValue;
-													//FLX_data.cnt_sms   = pCMD->outsms;
 
 													//decode
 													rxCVSD.set_ref(inRx.Ref_CVSD);
@@ -263,8 +266,8 @@ DWORD threadProc(LPVOID lParam)
 													if (pTask->hwnd) {
 														pTask->pEspFifo->put((void *)&FLX_data);
 														PostMessage((HWND__*)pTask->hwnd, ESP_EVENT,
-															WPARAM(pTask->pEspFifo->getnum()),
-															LPARAM(FLX_DATA)); 
+															WPARAM(&FLX_data),
+															LPARAM(inRx.Mode));
 													}
 													//else
 													{ //write to File
@@ -283,7 +286,7 @@ DWORD threadProc(LPVOID lParam)
 															sm.wSecond);
 
 
-														if (!fopen_s(&stream, name, "w")) {
+														if (!fopen_s(&stream, name, "wb")) {
 															fwrite(
 																&FLX_data,
 																sizeof(char),
@@ -302,64 +305,10 @@ DWORD threadProc(LPVOID lParam)
 											//break;
 
 											case GET_STATUS:
+												/*Установить флаг Запрос статуса*/
 												get_status++;
 											break;
-
-											case RET_STATUS:
-												float *pData = FLX_data.flx;
-												//Время
-												FLX_data.timeU = inRx.Time;
-												FLX_data.treshold = inRx.Treshold;
-												FLX_data.max_value = inRx.MaxValue;
-												//decode
-												rxCVSD.set_ref(inRx.Ref_CVSD);
-												rxCVSD.set_bitref(inRx.bitref_CVSD);
-
-												// >>>>>> Only 118 byte <<<<<<<   
-												for (int i = 0; i < inRx.Len_Data-2; i++) {
-													rxCVSD.cvsd_decode8(inRx.bData[i], pData);
-													pData += 8;
-												}
-												FLX_data.size = inRx.Len_Data-2;
-												//+ 2 byte  counter SMS
-												FLX_data.cnt_sms = inRx.bData[118] + inRx.bData[119] * 256;
-
-												if (pTask->hwnd)
-													PostMessage((HWND__*)pTask->hwnd, ESP_EVENT,
-														WPARAM(&FLX_data),
-														LPARAM(RET_STATUS));
-												
-												{ //write to File
-													FILE *stream;
-													SYSTEMTIME sm;
-													GetLocalTime(&sm);
-													char name[256];
-													//sprintf(name, "%i.flx", GetTime()/1000);
-													sprintf(name, "%i%02i%02i_%02i%02i%02i.flx",
-														sm.wYear,
-														sm.wMonth,
-														sm.wDay,
-
-														sm.wHour,
-														sm.wMinute,
-														sm.wSecond);
-
-
-													if (!fopen_s(&stream, name, "w")) {
-														fwrite(
-															&FLX_data,
-															sizeof(char),
-															sizeof(FLX_data),
-															stream);
-														fclose(stream);
-													}
-
-												}
-												DEBUG(TRACE, "RX RET_STATUS [T]:%i MaxFLX:%i\r\n", inRx.Time,inRx.MaxValue);
-											break;
-
 										}
-
 									}
 								}
 					} while (Len);
@@ -397,7 +346,7 @@ DWORD threadProc(LPVOID lParam)
 				if (in_pnt >= MAX_LEN_DATA) {
 					Tx_Data[nData].Len_Data = in_pnt;
 
-					if (Tx_Data[nData].MaxValue >= pTask->treshold) {
+					if (Tx_Data[nData].MaxValue >= pTask->treshold) { //Передача по превышению порога
 						if (pTask->pSerialCell) {
 							EnterCriticalSection(&pTask->CrSec);
 							pTask->pSerialCell->WriteData((BYTE*)&Tx_Data[nData], in_pnt + 20, &dwWritten);
@@ -406,7 +355,7 @@ DWORD threadProc(LPVOID lParam)
 							DEBUG(TRACE, "TX FLX_DATA [T]:%i MaxFLX:%i\r\n", Tx_Data[nData].Time, Tx_Data[nData].MaxValue);
 						}
 					}else 
-					if(get_status){ 
+					if(get_status){ //Был запрос текущего состояния ? 
 						//По запросу статуса вернем ВСЕ текущие данные (чтобы не пропадалала SMS)
 						get_status = 0;
 						Tx_Data[nData].Mode = RET_STATUS;
@@ -415,11 +364,7 @@ DWORD threadProc(LPVOID lParam)
 						if (pTask->pSerialCell) {
 							EnterCriticalSection(&pTask->CrSec);
 							pTask->pSerialCell->WriteData((BYTE*)&Tx_Data[nData], in_pnt + 20, &dwWritten);
-							
 							pTask->outsms++;
-							Tx_Data[nData].bData[118] = pTask->outsms;
-							Tx_Data[nData].bData[119] = pTask->outsms>>8;
-
 							LeaveCriticalSection(&pTask->CrSec);
 							DEBUG(TRACE, "TX RET_STATUS [T]:%i FLX:%i\r\n", Tx_Data[nData].Time,Tx_Data[nData].MaxValue);
 						}
