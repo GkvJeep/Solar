@@ -1,0 +1,1 @@
+implib -a libsolar.lib solarlib.dll
