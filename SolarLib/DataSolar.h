@@ -62,6 +62,7 @@ typedef unsigned char  CVSD_t;    // 8  bits
 	 DWORD timeU;                   //4
 	 uint16_t treshold;             //2
 	 uint16_t max_value;            //2 
+	 DWORD size;                    //4
 	 float flx[MAX_LEN_DATA * 8];   //4 * 960
 	 uint16_t cnt_sms;
  }flx_data, *pflx_data;
