@@ -135,8 +135,12 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
 	switch(Message.LParam)
 	{
 		case  FLX_DATA:
+		case  RET_STATUS:
+
+
 		//	elm = Message.WParam;
 			GetDataModem(hModem,&inData);
+			if(Message.LParam==FLX_DATA){
 			 sprintf_s(text,sizeof(text),
 			 "[UTC]%02i.%02i.%02i [TR]%5i [MAX]%5i",
 			  inData.timeU/10000000,
@@ -146,6 +150,18 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
 			 inData.max_value);
 			LogMemo->Font->Color=clLime;
 			LogMemo->Lines->Add(UnicodeString(text));
+			}else{
+			pCmd =(flx_data *)Message.WParam;
+			 sprintf_s(text,sizeof(text),
+			 "[UTC]%02i.%02i.%02i [TR]%5i [CUR]%5i <<<",
+			  pCmd->timeU/10000000,
+			 (pCmd->timeU/100000)%100,
+			 (pCmd->timeU/1000)%100,
+			 pCmd->treshold,
+			 pCmd->max_value);
+			 LogMemo->Lines->Add(UnicodeString(text));
+			 Edit1->Text = UIntToStr((unsigned)pCmd->treshold);
+			}
 
 		   {
 			for(int i = 0;i<MAX_LEN_DATA*8;i++){
@@ -160,7 +176,7 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
 				Chart1->BottomAxis->Minimum =
 				Chart1->BottomAxis->Maximum - MAX_LEN_DATA*8*3;  // we want to see the last 100 points only
 		break;
-
+/*
 		case  RET_STATUS:
 			pCmd =(flx_data *)Message.WParam;
 			 sprintf_s(text,sizeof(text),
@@ -173,7 +189,7 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
 			 LogMemo->Lines->Add(UnicodeString(text));
 			 Edit1->Text = UIntToStr((unsigned)pCmd->treshold);
 		break;
-
+  */
 	 }
  }
 void __fastcall TFormIpg::Button1Click(TObject *Sender)
