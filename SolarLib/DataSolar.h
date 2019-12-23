@@ -48,9 +48,11 @@ typedef unsigned char  CVSD_t;    // 8  bits
  uint16_t Len_Data;       //[8,9] (количество байт в обьединение (bData )
  uint16_t MaxValue;       //[10,11] (Значение по которому произошло событие)
  uint16_t Treshold;       //[12,13] Текущее значение порога
+ 
  float    Ref_CVSD;       //[14,15,16,17] Текущее значение  CVSD
- uint8_t  bitref_CVSD;    //[18] 
- uint8_t  CS;             //[19] (Контрольная сумма по модулю 256)
+ uint8_t  bitref_CVSD;    //[18] Bit index 
+
+ uint8_t  Cnt_SMS;        //[19] (Количество переданных SMS)
 						  //[20....139]  данные max 120 байт
    CVSD_t  bData[MAX_LEN_DATA];   // данные в кодировке  CVSD (смотри ниже класс CVSD )
 

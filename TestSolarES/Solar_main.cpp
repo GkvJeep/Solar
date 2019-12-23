@@ -142,7 +142,7 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
 			GetDataModem(hModem,&inData);
 			if(Message.LParam==FLX_DATA){
 			 sprintf_s(text,sizeof(text),
-			 "[UTC]%02i.%02i.%02i [TR]%5i [MAX]%5i",
+			 "[UTC]%02i.%02i.%02i [TR]%5i[MAX]%5i",
 			  inData.timeU/10000000,
 			 (inData.timeU/100000)%100,
 			 (inData.timeU/1000)%100,
@@ -153,7 +153,7 @@ void __fastcall TFormIpg::FormClose(TObject *Sender, TCloseAction &Action)
 			}else{
 			pCmd =(flx_data *)Message.WParam;
 			 sprintf_s(text,sizeof(text),
-			 "[UTC]%02i.%02i.%02i [TR]%5i [CUR]%5i <<<",
+			 "[UTC]%02i.%02i.%02i [TR]%5i[CUR]%5i<<",
 			  pCmd->timeU/10000000,
 			 (pCmd->timeU/100000)%100,
 			 (pCmd->timeU/1000)%100,

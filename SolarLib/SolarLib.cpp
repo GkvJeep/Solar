@@ -243,9 +243,9 @@ DWORD threadProc(LPVOID lParam)
 											case FLX_DATA: //Данные от телескопа 
 											case RET_STATUS:
 												if(inRx.Mode == FLX_DATA)
-												DEBUG(TRACE, "[R]DATA [T]:%6i FLX:%i\r\n", inRx.Time/1000, inRx.MaxValue);
+												DEBUG(TRACE, "RX DATA[T]:%6i FLX:%i\r\n", inRx.Time/1000, inRx.MaxValue);
 												else
-												DEBUG(TRACE, "[R]STATUS [T]:%6i FLX:%i\r\n", inRx.Time/1000, inRx.MaxValue);
+												DEBUG(TRACE, "RX STAT[T]:%6i FLX:%i\r\n", inRx.Time/1000, inRx.MaxValue);
 												{
 													float *pData = FLX_data.flx;
 													//Время
@@ -301,7 +301,8 @@ DWORD threadProc(LPVOID lParam)
 
 											case SET_PARAM: //Установить Порог
 												pTask->treshold = inRx.Treshold;
-												DEBUG(TRACE, "RX SET_PARAM [T] %i:[TRESHOLD]%i\r\n", GetTime()/1000, inRx.Treshold);
+												DEBUG(TRACE, "RX SETT[T] %i:[TR]%i\r\n", GetTime()/1000, inRx.Treshold);
+												//автоматически  выполним команду запрос текущего статуса
 											//break;
 
 											case GET_STATUS:
@@ -335,7 +336,7 @@ DWORD threadProc(LPVOID lParam)
 				//Текушее состояние CVSD
 					Tx_Data[nData].Ref_CVSD = txCVSD.get_ref();
 					Tx_Data[nData].bitref_CVSD = txCVSD.get_bitref();
-					Tx_Data[nData].CS = 0;
+					Tx_Data[nData].Cnt_SMS = 0;
 				}
 				Tx_Data[nData].bData[in_pnt++] = txCVSD.cvsd_encode8(samples);
 
@@ -348,25 +349,28 @@ DWORD threadProc(LPVOID lParam)
 
 					if (Tx_Data[nData].MaxValue >= pTask->treshold) { //Передача по превышению порога
 						if (pTask->pSerialCell) {
+							pTask->outsms++;
+							Tx_Data[nData].Cnt_SMS = pTask->outsms;
+
 							EnterCriticalSection(&pTask->CrSec);
 							pTask->pSerialCell->WriteData((BYTE*)&Tx_Data[nData], in_pnt + 20, &dwWritten);
-							pTask->outsms++;
 							LeaveCriticalSection(&pTask->CrSec);
-							DEBUG(TRACE, "TX FLX_DATA [T]:%i MaxFLX:%i\r\n", Tx_Data[nData].Time, Tx_Data[nData].MaxValue);
+
+							DEBUG(TRACE, "TX DATA[T]:%i FLX:%i\r\n", Tx_Data[nData].Time/1000, Tx_Data[nData].MaxValue);
 						}
 					}else 
-					if(get_status){ //Был запрос текущего состояния ? 
+					if(get_status){ //Передача по запросe текущего состояния ? 
 						//По запросу статуса вернем ВСЕ текущие данные (чтобы не пропадалала SMS)
 						get_status = 0;
 						Tx_Data[nData].Mode = RET_STATUS;
-						Tx_Data[nData].Len_Data = in_pnt;
-
 						if (pTask->pSerialCell) {
+							pTask->outsms++;
+							Tx_Data[nData].Cnt_SMS = pTask->outsms;
 							EnterCriticalSection(&pTask->CrSec);
 							pTask->pSerialCell->WriteData((BYTE*)&Tx_Data[nData], in_pnt + 20, &dwWritten);
-							pTask->outsms++;
 							LeaveCriticalSection(&pTask->CrSec);
-							DEBUG(TRACE, "TX RET_STATUS [T]:%i FLX:%i\r\n", Tx_Data[nData].Time,Tx_Data[nData].MaxValue);
+
+							DEBUG(TRACE, "TX STAT[T]:%i FLX:%i\r\n", Tx_Data[nData].Time/1000,Tx_Data[nData].MaxValue);
 						}
 					}
 

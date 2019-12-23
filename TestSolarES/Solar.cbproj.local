@@ -1,18 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.710,D:\FRDM_K64F\Tools\agc\CSVD\DataSolar.cpp=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.359,D:\Solar\WinAppl\agc\agc_main.dfm=D:\Solar\WinAppl\agc\Solar_main.dfm</Transaction>
     <Transaction>1899.12.30 00:00:00.000.419,D:\Solar_Work\agc\liquid\libliquid.lib=</Transaction>
     <Transaction>1899.12.30 00:00:00.000.974,=D:\Solar_Work\agc\liquid\libliquid.lib</Transaction>
     <Transaction>1899.12.30 00:00:00.000.474,D:\FRDM_K64F\Tools\agc\Unit1.cpp=D:\FRDM_K64F\Tools\agc\CSVD\DataSolar.cpp</Transaction>
     <Transaction>1899.12.30 00:00:00.000.474,D:\FRDM_K64F\Tools\agc\Unit1.h=D:\FRDM_K64F\Tools\agc\CSVD\DataSolar.h</Transaction>
     <Transaction>1899.12.30 00:00:00.000.359,D:\Solar\WinAppl\agc\agc_main.h=D:\Solar\WinAppl\agc\Solar_main.h</Transaction>
     <Transaction>1899.12.30 00:00:00.000.142,=D:\FRDM_K64F\Tools\agc\Unit1.cpp</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.441,=C:\Users\Piton\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.235,=C:\Users\Piton\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
     <Transaction>1899.12.30 00:00:00.000.086,D:\FRDM_K64F\Tools\agc\agc_main.dfm=C:\Users\Piton\Documents\Embarcadero\Studio\Projects\Unit4.dfm</Transaction>
     <Transaction>1899.12.30 00:00:00.000.719,D:\FRDM_K64F\Tools\agc\agc.cbproj=C:\Users\Piton\Documents\Embarcadero\Studio\Projects\Project1.cbproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.235,=C:\Users\Piton\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.359,D:\Solar\WinAppl\agc\agc_main.dfm=D:\Solar\WinAppl\agc\Solar_main.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.441,=C:\Users\Piton\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.710,D:\FRDM_K64F\Tools\agc\CSVD\DataSolar.cpp=</Transaction>
     <Transaction>1899.12.30 00:00:00.000.985,=D:\Solar_Work\WinAppl\ALL_BUILD\bin\Debug\LibSolar.lib</Transaction>
     <Transaction>1899.12.30 00:00:00.000.689,D:\FRDM_K64F\Tools\agc\agcPCH1.h=D:\FRDM_K64F\Tools\agc\Project1PCH1.h</Transaction>
     <Transaction>1899.12.30 00:00:00.000.072,D:\Solar\WinAppl\agc\agcPCH1.h=D:\Solar\WinAppl\agc\SolarPCH1.h</Transaction>

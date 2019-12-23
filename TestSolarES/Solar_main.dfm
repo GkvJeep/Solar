@@ -110,8 +110,6 @@ object FormIpg: TFormIpg
     ScrollBars = ssVertical
     TabOrder = 2
     OnDblClick = LogMemoDblClick
-    ExplicitLeft = 798
-    ExplicitTop = 35
   end
   object Chart1: TChart
     Left = 0
